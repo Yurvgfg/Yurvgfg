@@ -1,0 +1,143 @@
+import pgzrun
+
+WIDTH = 650
+HEIGHT = 480
+
+background = Actor('safe scp scene')
+player = Actor('player')
+player_holding_notebook = Actor('player holding notebook')
+enter_button = Actor('enter button')
+enter_button_2 = Actor('enter button')
+enter_button_3 = Actor('enter button')
+scp_999_room = Actor('scp 999 room.png')
+inventory = Actor('inventory')
+notes = Actor('notes')
+border_inventory = Actor('border inventory')
+scp_999_zoom_in = Actor('scp 999 zoom in.png')
+
+player.x = WIDTH // 20
+player.y = HEIGHT - 110
+enter_button.x = WIDTH - 558
+enter_button.y = HEIGHT - 250
+enter_button_2.x = WIDTH - 165
+enter_button_2.y = HEIGHT - 250
+enter_button_3.x = WIDTH - 60
+enter_button_3.y = HEIGHT - 160
+inventory.x = WIDTH - 350
+inventory.y += 50
+notes.x = WIDTH - 450
+notes.y += 55
+border_inventory.x = WIDTH - 449
+border_inventory.y += 51
+
+door_area_x = WIDTH - 558
+door_area_y = HEIGHT - 250
+door_area_width = 100
+door_area_height = 170
+
+door_area_2_x = WIDTH - 180
+door_area_2_y = HEIGHT - 170
+door_area_2_width = 100
+door_area_2_height = 170
+
+card_area_x = WIDTH - 450
+card_area_y = HEIGHT - 250
+card_area_x_width = 100
+card_area_y_height = 170
+
+enter_button_3.x = card_area_x + card_area_x_width + 35
+enter_button_3.y = 160
+
+enter_button_visible = True
+enter_button_2_visible = True
+enter_button_3_visible = True
+in_scp_999_room = False
+in_scp_999_zoom_in = False
+border_inventory_visible = True
+
+border_inventory_start_x = WIDTH - 449
+border_inventory_x = border_inventory_start_x
+border_inventory_visible = True
+
+def draw():
+    if in_scp_999_room:
+        scp_999_room.draw()
+    elif in_scp_999_zoom_in:
+        scp_999_zoom_in.draw()
+    else:
+        background.draw()
+
+    if border_inventory_x == border_inventory_start_x:
+        player_holding_notebook.pos = player.pos
+        player_holding_notebook.draw()
+    else:
+        player.draw()
+
+    inventory.draw()
+    notes.draw()
+    border_inventory.draw()
+
+    if enter_button_visible and player.x > door_area_x and player.x < door_area_x + door_area_width and \
+       player.y > door_area_y and player.y < door_area_y + door_area_height:
+        enter_button.draw()
+
+    if enter_button_2_visible and player.x > door_area_2_x and player.x < door_area_2_x + door_area_2_width and \
+       player.y > door_area_2_y and player.y < door_area_2_y + door_area_2_height:
+        enter_button_2.draw()
+
+    if enter_button_3_visible and player.x > card_area_x and player.x < card_area_x + card_area_x_width and \
+       player.y > card_area_y and player.y < card_area_y + card_area_y_height:
+        enter_button_3.draw()
+
+    if border_inventory_visible:
+        border_inventory.x = border_inventory_x
+        border_inventory.draw()
+
+def update():
+    if keyboard.a:
+        player.x -= 2
+        if player.left < 0:
+            player.left = 0
+    elif keyboard.d:
+        player.x += 2
+        if player.right > WIDTH:
+            player.right = WIDTH
+    elif keyboard.left:
+        player.x -= 2
+        if player.left < 0:
+            player.left = 0
+    elif keyboard.right:
+        player.x += 2
+        if player.right > WIDTH:
+            player.right = WIDTH
+
+def on_key_down(key):
+    global enter_button_visible, in_scp_999_room, enter_button_2_visible, border_inventory_x, enter_button_3_visible, in_scp_999_zoom_in
+
+    if key == keys.E and enter_button_visible:
+        print("Entered scp - 999 room")
+        in_scp_999_room = True
+        enter_button_visible = False
+        enter_button_2_visible = False
+        enter_button_3_visible = False
+    elif key == keys.E and enter_button_3_visible:
+        print("Entered scp_999_zoom_in")
+        in_scp_999_room = False
+        in_scp_999_zoom_in = True
+        enter_button_visible = False
+        enter_button_2_visible = False
+        enter_button_3_visible = False
+    elif key == keys.KP_2 or key == keys.K_2:
+        if border_inventory_x == border_inventory_start_x:
+            border_inventory_x += 40
+        elif border_inventory_x == border_inventory_start_x + 200:
+            border_inventory_x = border_inventory_start_x
+        else:
+            border_inventory_x += 40
+    elif key == keys.KP_1 or key == keys.K_1:
+        if border_inventory_x == border_inventory_start_x:
+            border_inventory_x += 200
+        else:
+            border_inventory_x -= 40
+
+pgzrun.go()
